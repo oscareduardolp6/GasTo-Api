@@ -12,7 +12,6 @@ func MakeCreateGasRecord(repository GasRecordRepository) gasRecordCreator {
 		if creationError != nil {
 			return creationError
 		}
-		defer repository.Close()
 		return <-repository.Save(gasRecord)
 	}
 }
