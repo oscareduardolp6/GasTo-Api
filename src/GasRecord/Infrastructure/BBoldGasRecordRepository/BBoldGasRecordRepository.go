@@ -11,14 +11,15 @@ import (
 const (
 	read_and_write_permission = 0600
 	bucket_name               = "GasRecords"
+	db_path                   = "database.db"
 )
 
 type bboldGasRepository struct {
 	db *bbolt.DB
 }
 
-func NewGasRecordRepository(dbPath string) (GasRecordRepository, error) {
-	db, dbError := bbolt.Open(dbPath, read_and_write_permission, nil)
+func NewGasRecordRepository() (GasRecordRepository, error) {
+	db, dbError := bbolt.Open(db_path, read_and_write_permission, nil)
 	if dbError != nil {
 		return nil, dbError
 	}
