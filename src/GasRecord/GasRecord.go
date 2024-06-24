@@ -1,6 +1,7 @@
 package gasrecord
 
 import (
+	"math"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -21,6 +22,12 @@ type GasRecord struct {
 	TraveledKilometers float32   `validate:"gte=0"`
 	PriceByLiter       float32   `validate:"gte=0"`
 	Date               time.Time `validate:"required"`
+}
+
+func (gasrecord GasRecord) GetPerformance() float32 {
+	rawPerformance := gasrecord.TraveledKilometers / gasrecord.Liters
+	return float32(math.Ceil(float64(rawPerformance)))
+
 }
 
 func CreateGasRecord(gasRecordPrimitives GasRecord) (GasRecord, error) {
