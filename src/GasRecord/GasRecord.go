@@ -22,6 +22,7 @@ type GasRecord struct {
 	TraveledKilometers float32   `validate:"gte=0"`
 	PriceByLiter       float32   `validate:"gte=0"`
 	Date               time.Time `validate:"required"`
+	RoadTrip           bool
 }
 
 func (gasrecord GasRecord) GetPerformance() float32 {
