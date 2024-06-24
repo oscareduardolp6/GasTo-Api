@@ -24,7 +24,7 @@ func (repo *bboldGasRepository) GetAll() chan []GasRecord {
 				var rawRecord bboldGasRecord
 				parsingError := json.Unmarshal(row, &rawRecord)
 				if parsingError != nil {
-					return NewParsingRecordError(row)
+					return newParsingRecordError(row)
 				}
 				record := fromBBoldGasRecord(rawRecord)
 				records = append(records, record)

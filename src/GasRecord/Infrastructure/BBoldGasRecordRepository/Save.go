@@ -21,7 +21,7 @@ func (repo *bboldGasRepository) Save(gasRecord GasRecord) chan error {
 			data := toBBoldGasRecord(gasRecord)
 			encodedData, parsingError := json.Marshal(data)
 			if parsingError != nil {
-				return NewParsingRecordError([]byte{})
+				return newParsingRecordError([]byte{})
 			}
 			return bucket.Put([]byte(gasRecord.Id), encodedData)
 		})

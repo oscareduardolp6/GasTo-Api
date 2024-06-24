@@ -32,7 +32,7 @@ func NewGasRecordRepository() (GasRecordRepository, error) {
 }
 
 func bucketNotFoundError() error {
-	return NewBucketNotFound(bucket_name)
+	return newBucketNotFound(bucket_name)
 }
 
 func handleError(err error) {
@@ -41,7 +41,7 @@ func handleError(err error) {
 	}
 
 	switch e := err.(type) {
-	case BucketNotFound, ParsingError:
+	case bucketNotFound, parsingError:
 		message := fmt.Sprintf("Catched: %v", e)
 		log.Fatal(message)
 	default:
