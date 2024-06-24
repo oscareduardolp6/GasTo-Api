@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 )
 
 var validate *validator.Validate
@@ -24,19 +23,10 @@ type GasRecord struct {
 	Date               time.Time `validate:"required"`
 }
 
-func CreateGasRecord(place string, liters, totalPrice, traveledKms, priceByLiter float32, date time.Time) (GasRecord, error) {
-	gasRecord := GasRecord{
-		Id:                 uuid.NewString(),
-		Place:              place,
-		Liters:             liters,
-		TotalPrice:         totalPrice,
-		TraveledKilometers: traveledKms,
-		PriceByLiter:       priceByLiter,
-		Date:               date,
-	}
-	err := validate.Struct(gasRecord)
+func CreateGasRecord(gasRecordPrimitives GasRecord) (GasRecord, error) {
+	err := validate.Struct(gasRecordPrimitives)
 	if err != nil {
 		return GasRecord{}, err
 	}
-	return gasRecord, nil
+	return gasRecordPrimitives, nil
 }
