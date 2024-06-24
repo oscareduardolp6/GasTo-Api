@@ -13,6 +13,7 @@ type bboldGasRecord struct {
 	PriceByLiter       float32   `json:"price_by_liter"`
 	TotalPrice         float32   `json:"total_price"`
 	Date               time.Time `json:"date"`
+	RoadTrip           bool      `json:"road_trip"`
 }
 
 func toBBoldGasRecord(record GasRecord) bboldGasRecord {
@@ -24,6 +25,7 @@ func toBBoldGasRecord(record GasRecord) bboldGasRecord {
 		PriceByLiter:       record.PriceByLiter,
 		TotalPrice:         record.TotalPrice,
 		Date:               record.Date,
+		RoadTrip:           record.RoadTrip,
 	}
 }
 
@@ -36,5 +38,6 @@ func fromBBoldGasRecord(dto bboldGasRecord) GasRecord {
 		PriceByLiter:       dto.PriceByLiter,
 		TotalPrice:         dto.TotalPrice,
 		Date:               dto.Date,
+		RoadTrip:           dto.RoadTrip,
 	}
 }
