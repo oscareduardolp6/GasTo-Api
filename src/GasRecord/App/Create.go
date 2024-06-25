@@ -12,6 +12,8 @@ func MakeCreateGasRecord(repository GasRecordRepository) gasRecordCreator {
 		if creationError != nil {
 			return creationError
 		}
-		return <-repository.Save(gasRecord)
+		savingErrorChan := make(chan error)
+		go repository.Save(gasRecord, savingErrorChan)
+		return <-savingErrorChan
 	}
 }

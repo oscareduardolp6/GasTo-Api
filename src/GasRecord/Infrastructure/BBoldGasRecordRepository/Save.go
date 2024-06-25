@@ -8,14 +8,13 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func (repo *bboldGasRepository) Save(gasRecord GasRecord) chan error {
-	resultChan := make(chan error)
+func (repo *bboldGasRepository) Save(gasRecord GasRecord, savedError chan<- error) {
+	updateErrorChan := make(chan error, 1) // Buffer de 1 para evitar bloqueo
 
 	go func() {
 		updateError := repo.db.Update(func(transaction *bbolt.Tx) error {
 			bucket := transaction.Bucket([]byte(bucket_name))
-			bucketNotFound := bucket == nil
-			if bucketNotFound {
+			if bucket == nil {
 				return bucketNotFoundError()
 			}
 			data := toBBoldGasRecord(gasRecord)
@@ -25,17 +24,16 @@ func (repo *bboldGasRepository) Save(gasRecord GasRecord) chan error {
 			}
 			return bucket.Put([]byte(gasRecord.Id), encodedData)
 		})
-
-		var savingError error = nil
-
-		if updateError != nil {
-			log.Printf("Update error: %v", updateError.Error())
-			savingError = NewRecordNotSaved(gasRecord)
-		}
-
-		resultChan <- savingError
-		close(resultChan)
+		updateErrorChan <- updateError
+		close(updateErrorChan)
 	}()
 
-	return resultChan
+	var savingError error = nil
+	if updateError := <-updateErrorChan; updateError != nil {
+		log.Printf("Update error: %v", updateError.Error())
+		savingError = NewRecordNotSaved(gasRecord)
+	}
+
+	savedError <- savingError
+	close(savedError)
 }
