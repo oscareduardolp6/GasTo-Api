@@ -27,14 +27,17 @@ func (bus *inMemoryEventBus) Unsuscribe(topic string, handler domain.EventHandle
 	bus.lock.Lock()
 	defer bus.lock.Unlock()
 
-	if handlers, found := bus.suscribers[topic]; found {
-		for index, registerHandlers := range handlers {
-			handlerExistsInRegisters := fmt.Sprintf("%v", registerHandlers) == fmt.Sprintf("%v", handler)
-			if handlerExistsInRegisters {
+	if handlers, hasHandlers := bus.suscribers[topic]; hasHandlers {
+		for index, registerHandler := range handlers {
+			if areSameHandler(registerHandler, handler) {
 				bus.suscribers[topic] = domain.RemoveFromArrayUnsafe(handlers, index)
 			}
 		}
 	}
+}
+
+func areSameHandler(handler1, handler2 domain.EventHandler) bool {
+	return fmt.Sprintf("%v", handler1) == fmt.Sprintf("%v", handler2)
 }
 
 func (bus *inMemoryEventBus) Publish(event domain.Event) {
