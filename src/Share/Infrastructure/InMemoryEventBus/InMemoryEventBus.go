@@ -20,7 +20,7 @@ func CreateInMemoryEventBus(waitGroup *sync.WaitGroup) domain.EventBus {
 }
 
 func (bus *inMemoryEventBus) Suscribe(topic string, handler domain.EventHandler) {
-	bus.wg.Add(5)
+	bus.wg.Add(1)
 	bus.lock.Lock()
 	defer bus.lock.Unlock()
 	bus.suscribers[topic] = append(bus.suscribers[topic], handler)

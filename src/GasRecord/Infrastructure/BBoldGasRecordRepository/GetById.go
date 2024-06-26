@@ -9,53 +9,86 @@ import (
 )
 
 func (repo *bboldGasRepository) GetById(id string) (GasRecord, error) {
-	foundChan := make(chan GasRecord)
-	errorChan := make(chan error)
+	var record GasRecord
 
-	go func() {
-		defer close(errorChan)
-		transactionError := repo.db.View(func(transaction *bbolt.Tx) error {
-			defer close(foundChan)
-			bucket := transaction.Bucket([]byte(bucket_name))
-			bucketNotFound := bucket == nil
-			if bucketNotFound {
-				return bucketNotFoundError()
-			}
-			byteRecord := bucket.Get([]byte(id))
-
-			if byteRecord == nil {
-				return RecordNotFound{id}
-			}
-
-			var rawRecord bboldGasRecord
-
-			parsingError := json.Unmarshal(byteRecord, &rawRecord)
-
-			if parsingError != nil {
-				return newParsingRecordError(byteRecord)
-			}
-
-			record := fromBBoldGasRecord(rawRecord)
-
-			foundChan <- record
-			return nil
-		})
-
-		if transactionError != nil {
-			errorChan <- transactionError
+	transactionError := repo.db.View(func(transaction *bbolt.Tx) error {
+		bucket := transaction.Bucket([]byte(bucket_name))
+		bucketNotFound := bucket == nil
+		if bucketNotFound {
+			return bucketNotFoundError()
 		}
 
-	}()
-
-	for {
-		select {
-		case foundRecord := <-foundChan:
-			return foundRecord, nil
-		case gettingError := <-errorChan:
-			return GasRecord{}, gettingError
+		byteRecord := bucket.Get([]byte(id))
+		if byteRecord == nil {
+			return RecordNotFound{id}
 		}
 
+		var rawRecord bboldGasRecord
+
+		parsingError := json.Unmarshal(byteRecord, &rawRecord)
+
+		if parsingError != nil {
+			return newParsingRecordError(byteRecord)
+		}
+
+		record = fromBBoldGasRecord(rawRecord)
+
+		return nil
+	})
+
+	if transactionError != nil {
+		return GasRecord{}, transactionError
 	}
+
+	return record, nil
+
+	// foundChan := make(chan GasRecord)
+	// errorChan := make(chan error)
+
+	// go func() {
+	// 	defer close(errorChan)
+	// 	transactionError := repo.db.View(func(transaction *bbolt.Tx) error {
+	// 		defer close(foundChan)
+	// 		bucket := transaction.Bucket([]byte(bucket_name))
+	// 		bucketNotFound := bucket == nil
+	// 		if bucketNotFound {
+	// 			return bucketNotFoundError()
+	// 		}
+	// 		byteRecord := bucket.Get([]byte(id))
+
+	// 		if byteRecord == nil {
+	// 			return RecordNotFound{id}
+	// 		}
+
+	// 		var rawRecord bboldGasRecord
+
+	// 		parsingError := json.Unmarshal(byteRecord, &rawRecord)
+
+	// 		if parsingError != nil {
+	// 			return newParsingRecordError(byteRecord)
+	// 		}
+
+	// 		record := fromBBoldGasRecord(rawRecord)
+
+	// 		foundChan <- record
+	// 		return nil
+	// 	})
+
+	// 	if transactionError != nil {
+	// 		errorChan <- transactionError
+	// 	}
+
+	// }()
+
+	// for {
+	// 	select {
+	// 	case foundRecord := <-foundChan:
+	// 		return foundRecord, nil
+	// 	case gettingError := <-errorChan:
+	// 		return GasRecord{}, gettingError
+	// 	}
+
+	// }
 }
 
 type RecordNotFound struct {

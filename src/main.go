@@ -40,6 +40,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	waitGroup.Wait()
+
 }
 
 func configureSuscriptions(eventBus share.EventBus, repo domain.GasRecordRepository) {

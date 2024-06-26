@@ -8,7 +8,6 @@ import (
 
 func (repo *bboldGasRepository) Search(criteria share.Criteria[GasRecord]) []GasRecord {
 	allRecords := repo.GetAll()
-
 	filterRecords := []GasRecord{}
 
 	for _, record := range allRecords {

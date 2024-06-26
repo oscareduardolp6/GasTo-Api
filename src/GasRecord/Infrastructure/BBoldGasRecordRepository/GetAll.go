@@ -9,13 +9,14 @@ import (
 
 func (repo *bboldGasRepository) GetAll() []GasRecord {
 	var records []GasRecord
+	done := make(chan struct{})
 
 	go func() {
+		defer close(done)
 
 		transactionError := repo.db.View(func(transaction *bbolt.Tx) error {
 			bucket := transaction.Bucket([]byte(bucket_name))
-			bucketNotFound := bucket == nil
-			if bucketNotFound {
+			if bucket == nil {
 				return bucketNotFoundError()
 			}
 
@@ -27,14 +28,15 @@ func (repo *bboldGasRepository) GetAll() []GasRecord {
 				}
 				record := fromBBoldGasRecord(rawRecord)
 				records = append(records, record)
-				var noError error = nil
-				return noError
+				return nil
 			})
 		})
 
 		handleError(transactionError)
-
 	}()
+
+	// Esperar a que la goroutine termine
+	<-done
 
 	return records
 }

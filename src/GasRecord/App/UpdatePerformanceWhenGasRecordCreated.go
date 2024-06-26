@@ -3,6 +3,7 @@ package app
 import (
 	. "gasto-api/src/GasRecord"
 	share "gasto-api/src/Share"
+	"log"
 )
 
 func MakeUpdatePerformanceWhenGasRecordCreated(repo GasRecordRepository) func(share.Event) {
@@ -12,7 +13,10 @@ func MakeUpdatePerformanceWhenGasRecordCreated(repo GasRecordRepository) func(sh
 		}
 		updatePerformance := MakeUpdatePerformanceGasRecord(repo)
 		gasRecord, _ := event.Payload.(GasRecord)
-		updatePerformance(gasRecord.Id)
+		err := updatePerformance(gasRecord.Id)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
