@@ -1,6 +1,7 @@
 package gasrecord
 
 import (
+	share "gasto-api/src/Share"
 	"math"
 	"time"
 
@@ -23,18 +24,30 @@ type GasRecord struct {
 	PriceByLiter       float32   `validate:"gte=0"`
 	Date               time.Time `validate:"required"`
 	RoadTrip           bool
+	Performance        float32 //Calculated
+	domainEvents       []share.Event
 }
 
-func (gasrecord GasRecord) GetPerformance() float32 {
-	rawPerformance := gasrecord.TraveledKilometers / gasrecord.Liters
+func CalculatePerformance(previous GasRecord, next GasRecord) float32 {
+	rawPerformance := next.TraveledKilometers / previous.Liters
 	return float32(math.Ceil(float64(rawPerformance)))
-
 }
 
-func CreateGasRecord(gasRecordPrimitives GasRecord) (GasRecord, error) {
+func (gasRecord *GasRecord) PullAllDomainEvents() []share.Event {
+	numOfEvents := len(gasRecord.domainEvents)
+	returnedEvents := make([]share.Event, numOfEvents)
+	copy(returnedEvents, gasRecord.domainEvents)
+	gasRecord.domainEvents = []share.Event{}
+	return returnedEvents
+}
+
+func CreateGasRecord(gasRecordPrimitives GasRecord) (*GasRecord, error) {
 	err := validate.Struct(gasRecordPrimitives)
 	if err != nil {
-		return GasRecord{}, err
+		return nil, err
 	}
-	return gasRecordPrimitives, nil
+
+	newGasRecord := gasRecordPrimitives
+	newGasRecord.domainEvents = []share.Event{CreateGasRecordCreatedEvent(gasRecordPrimitives)}
+	return &newGasRecord, nil
 }

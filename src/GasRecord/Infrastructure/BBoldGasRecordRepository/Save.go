@@ -8,7 +8,7 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func (repo *bboldGasRepository) Save(gasRecord GasRecord, savedError chan<- error) {
+func (repo *bboldGasRepository) Save(gasRecord GasRecord) error {
 	updateErrorChan := make(chan error, 1) // Buffer de 1 para evitar bloqueo
 
 	go func() {
@@ -34,6 +34,5 @@ func (repo *bboldGasRepository) Save(gasRecord GasRecord, savedError chan<- erro
 		savingError = NewRecordNotSaved(gasRecord)
 	}
 
-	savedError <- savingError
-	close(savedError)
+	return savingError
 }

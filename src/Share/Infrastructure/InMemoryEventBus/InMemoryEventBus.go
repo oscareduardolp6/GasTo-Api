@@ -9,21 +9,25 @@ import (
 type inMemoryEventBus struct {
 	suscribers map[string][]domain.EventHandler
 	lock       sync.RWMutex
+	wg         *sync.WaitGroup
 }
 
-func CreateInMemoryEventBus() domain.EventBus {
+func CreateInMemoryEventBus(waitGroup *sync.WaitGroup) domain.EventBus {
 	return &inMemoryEventBus{
 		suscribers: make(map[string][]domain.EventHandler),
+		wg:         waitGroup,
 	}
 }
 
 func (bus *inMemoryEventBus) Suscribe(topic string, handler domain.EventHandler) {
+	bus.wg.Add(5)
 	bus.lock.Lock()
 	defer bus.lock.Unlock()
 	bus.suscribers[topic] = append(bus.suscribers[topic], handler)
 }
 
 func (bus *inMemoryEventBus) Unsuscribe(topic string, handler domain.EventHandler) {
+	bus.wg.Done()
 	bus.lock.Lock()
 	defer bus.lock.Unlock()
 
@@ -41,11 +45,15 @@ func areSameHandler(handler1, handler2 domain.EventHandler) bool {
 }
 
 func (bus *inMemoryEventBus) Publish(event domain.Event) {
-	bus.lock.Lock()
+	bus.lock.RLock()
 	defer bus.lock.RUnlock()
 	if handlers, found := bus.suscribers[event.Topic]; found {
-		for _, handler := range handlers {
-			go handler(event)
+		for _, _handler := range handlers {
+			handler := _handler
+			go func() {
+				handler(event)
+				bus.wg.Done()
+			}()
 		}
 	}
 }

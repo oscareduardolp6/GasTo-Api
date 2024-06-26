@@ -7,11 +7,10 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func (repo *bboldGasRepository) GetAll() chan []GasRecord {
-	resultChan := make(chan []GasRecord)
+func (repo *bboldGasRepository) GetAll() []GasRecord {
+	var records []GasRecord
 
 	go func() {
-		var records []GasRecord
 
 		transactionError := repo.db.View(func(transaction *bbolt.Tx) error {
 			bucket := transaction.Bucket([]byte(bucket_name))
@@ -35,9 +34,7 @@ func (repo *bboldGasRepository) GetAll() chan []GasRecord {
 
 		handleError(transactionError)
 
-		resultChan <- records
-		close(resultChan)
 	}()
 
-	return resultChan
+	return records
 }
