@@ -28,9 +28,14 @@ type GasRecord struct {
 	domainEvents       []share.Event
 }
 
-func CalculatePerformance(previous GasRecord, next GasRecord) float32 {
+func calculatePerformance(previous GasRecord, next GasRecord) float32 {
 	rawPerformance := next.TraveledKilometers / previous.Liters
 	return float32(math.Ceil(float64(rawPerformance)))
+}
+
+func (gasRecord *GasRecord) UpadatePerformance(next GasRecord) {
+	gasRecord.Performance = calculatePerformance(*gasRecord, next)
+	gasRecord.domainEvents = append(gasRecord.domainEvents, CreateGasRecordPerformanceUpdated(*gasRecord))
 }
 
 func (gasRecord *GasRecord) PullAllDomainEvents() []share.Event {

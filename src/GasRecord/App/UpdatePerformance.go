@@ -19,8 +19,7 @@ func MakeUpdatePerformanceGasRecord(repository domain.GasRecordRepository) func(
 			return nil
 		}
 		recordBeforeCreatedRecord := previousRecords[len(previousRecords)-1]
-		recordBeforeCreatedRecord.Performance = domain.CalculatePerformance(recordBeforeCreatedRecord, createdGasRecord)
-
+		recordBeforeCreatedRecord.UpadatePerformance(createdGasRecord)
 		savingError := repository.Save(recordBeforeCreatedRecord)
 		if savingError == nil {
 			log.Printf("Performance Updated for Id: %v", recordBeforeCreatedRecord.Id)
