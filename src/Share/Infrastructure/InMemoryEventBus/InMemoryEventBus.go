@@ -20,14 +20,12 @@ func CreateInMemoryEventBus(waitGroup *sync.WaitGroup) domain.EventBus {
 }
 
 func (bus *inMemoryEventBus) Suscribe(topic string, handler domain.EventHandler) {
-	bus.wg.Add(1)
 	bus.lock.Lock()
 	defer bus.lock.Unlock()
 	bus.suscribers[topic] = append(bus.suscribers[topic], handler)
 }
 
 func (bus *inMemoryEventBus) Unsuscribe(topic string, handler domain.EventHandler) {
-	bus.wg.Done()
 	bus.lock.Lock()
 	defer bus.lock.Unlock()
 
@@ -49,6 +47,7 @@ func (bus *inMemoryEventBus) Publish(event domain.Event) {
 	defer bus.lock.RUnlock()
 	if handlers, found := bus.suscribers[event.Topic]; found {
 		for _, _handler := range handlers {
+			bus.wg.Add(1)
 			handler := _handler
 			go func() {
 				handler(event)
