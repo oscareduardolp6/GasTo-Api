@@ -1,9 +1,9 @@
 package app
 
 import (
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 )
 
-func MakeGetAllGasRecords(repository GasRecordRepository) func() []GasRecord {
+func MakeGetAllGasRecords(repository domain.GasRecordRepository) func() []domain.GasRecord {
 	return repository.GetAll
 }

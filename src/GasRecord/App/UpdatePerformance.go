@@ -1,12 +1,12 @@
 package app
 
 import (
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 	"log"
 	"time"
 )
 
-func MakeUpdatePerformanceGasRecord(repository GasRecordRepository) func(createdRecordId string) error {
+func MakeUpdatePerformanceGasRecord(repository domain.GasRecordRepository) func(createdRecordId string) error {
 	return func(createdRecordId string) error {
 		createdGasRecord, gettingError := repository.GetById(createdRecordId)
 		if gettingError != nil {
@@ -19,7 +19,7 @@ func MakeUpdatePerformanceGasRecord(repository GasRecordRepository) func(created
 			return nil
 		}
 		recordBeforeCreatedRecord := previousRecords[len(previousRecords)-1]
-		recordBeforeCreatedRecord.Performance = CalculatePerformance(recordBeforeCreatedRecord, createdGasRecord)
+		recordBeforeCreatedRecord.Performance = domain.CalculatePerformance(recordBeforeCreatedRecord, createdGasRecord)
 
 		savingError := repository.Save(recordBeforeCreatedRecord)
 		if savingError == nil {
@@ -33,10 +33,10 @@ type SortingByDateCriteriaAndBeforeThanADate struct {
 	Date time.Time
 }
 
-func (criteria SortingByDateCriteriaAndBeforeThanADate) Filter(val GasRecord) bool {
+func (criteria SortingByDateCriteriaAndBeforeThanADate) Filter(val domain.GasRecord) bool {
 	return val.Date.Before(criteria.Date)
 }
 
-func (criteria SortingByDateCriteriaAndBeforeThanADate) SortingLess(val1, val2 GasRecord) bool {
+func (criteria SortingByDateCriteriaAndBeforeThanADate) SortingLess(val1, val2 domain.GasRecord) bool {
 	return val1.Date.Before(val2.Date)
 }

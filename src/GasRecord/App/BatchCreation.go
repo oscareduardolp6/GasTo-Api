@@ -1,7 +1,7 @@
 package app
 
 import (
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 	"sync"
 )
 
@@ -11,15 +11,15 @@ type Result struct {
 	CreationError      error
 }
 
-func MakeBatchCreation(creationUseCase func(GasRecord) error) func(reader <-chan GasRecord) <-chan Result {
-	return func(records <-chan GasRecord) <-chan Result {
+func MakeBatchCreation(creationUseCase func(domain.GasRecord) error) func(reader <-chan domain.GasRecord) <-chan Result {
+	return func(records <-chan domain.GasRecord) <-chan Result {
 		resultsChan := make(chan Result)
 		var waitGroup sync.WaitGroup
 
 		go func() {
 			for record := range records {
 				waitGroup.Add(1)
-				go func(record GasRecord) {
+				go func(record domain.GasRecord) {
 					defer waitGroup.Done()
 					creationError := creationUseCase(record)
 					success := creationError == nil

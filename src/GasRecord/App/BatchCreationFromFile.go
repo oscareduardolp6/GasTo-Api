@@ -2,11 +2,11 @@ package app
 
 import (
 	"fmt"
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 	infra "gasto-api/src/GasRecord/Infrastructure"
 )
 
-func MakeBatchCreationFromFile(batchCreation func(reader <-chan GasRecord) <-chan Result) func(filepath string) error {
+func MakeBatchCreationFromFile(batchCreation func(reader <-chan domain.GasRecord) <-chan Result) func(filepath string) error {
 	return func(filepath string) error {
 		reader, errorReadingFile := infra.ReadRecordsFromTextFile(filepath)
 		if errorReadingFile != nil {
