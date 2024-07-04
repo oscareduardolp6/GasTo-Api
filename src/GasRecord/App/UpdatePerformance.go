@@ -14,6 +14,10 @@ func MakeUpdatePerformanceGasRecord(repository GasRecordRepository) func(created
 		}
 
 		previousRecords := repository.Search(SortingByDateCriteriaAndBeforeThanADate{createdGasRecord.Date})
+		if len(previousRecords) == 0 {
+			log.Print("No performance update, this is the first record")
+			return nil
+		}
 		recordBeforeCreatedRecord := previousRecords[len(previousRecords)-1]
 		recordBeforeCreatedRecord.Performance = CalculatePerformance(recordBeforeCreatedRecord, createdGasRecord)
 
