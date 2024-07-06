@@ -46,12 +46,15 @@ func (gasRecord *GasRecord) PullAllDomainEvents() []share.Event {
 	return returnedEvents
 }
 
-func CreateGasRecord(gasRecordPrimitives GasRecord) (*GasRecord, error) {
-	err := validate.Struct(gasRecordPrimitives)
-	if err != nil {
-		return nil, err
-	}
+func ValidatePrimitives(gasRecord GasRecord) error {
+	return validate.Struct(gasRecord)
+}
 
+func CreateGasRecord(gasRecordPrimitives GasRecord) (*GasRecord, error) {
+	validationError := ValidatePrimitives(gasRecordPrimitives)
+	if validationError != nil {
+		return nil, validationError
+	}
 	newGasRecord := gasRecordPrimitives
 	newGasRecord.domainEvents = []share.Event{CreateGasRecordCreatedEvent(gasRecordPrimitives)}
 	return &newGasRecord, nil
