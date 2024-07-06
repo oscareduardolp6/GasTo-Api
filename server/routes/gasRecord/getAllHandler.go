@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func MakeGetAllGetHandler(getAll func() []domain.GasRecord) http.HandlerFunc {
+func makeGetAllGetHandler(getAll func() []domain.GasRecord) http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		jsonData, parsingError := json.Marshal(getAll())
 		if parsingError != nil {

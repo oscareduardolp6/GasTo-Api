@@ -10,7 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func MakeGasRecordPutHandler(createGasRecord func(domain.GasRecord) error) func(http.ResponseWriter, *http.Request) {
+func makeGasRecordPutHandler(createGasRecord func(domain.GasRecord) error) func(http.ResponseWriter, *http.Request) {
 	return func(responseWriter http.ResponseWriter, req *http.Request) {
 		body, bodyError := io.ReadAll(req.Body)
 		if bodyError != nil {
