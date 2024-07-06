@@ -27,6 +27,7 @@ func toBBoldGasRecord(record GasRecord) bboldGasRecord {
 		TotalPrice:         record.TotalPrice,
 		Date:               record.Date,
 		RoadTrip:           record.RoadTrip,
+		Performance:        record.Performance,
 	}
 }
 

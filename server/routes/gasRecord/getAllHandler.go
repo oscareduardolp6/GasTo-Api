@@ -11,9 +11,10 @@ func makeGetAllGetHandler(getAll func() []domain.GasRecord) http.HandlerFunc {
 		jsonData, parsingError := json.Marshal(getAll())
 		if parsingError != nil {
 			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
 			return
 		}
+		res.WriteHeader(http.StatusOK)
 		res.Write(jsonData)
-		res.WriteHeader(http.StatusAccepted)
 	}
 }

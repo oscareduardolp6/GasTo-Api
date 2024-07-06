@@ -15,6 +15,7 @@ func makeGasRecordPutHandler(createGasRecord func(domain.GasRecord) error) func(
 		body, bodyError := io.ReadAll(req.Body)
 		if bodyError != nil {
 			responseWriter.WriteHeader(http.StatusBadRequest)
+			responseWriter.Write(nil)
 			return
 		}
 		defer req.Body.Close()
@@ -35,9 +36,11 @@ func makeGasRecordPutHandler(createGasRecord func(domain.GasRecord) error) func(
 		creationError := createGasRecord(primitives)
 		if creationError != nil {
 			responseWriter.WriteHeader(http.StatusInternalServerError)
+			responseWriter.Write(nil)
 			log.Print(creationError.Error())
 			return
 		}
 		responseWriter.WriteHeader(http.StatusAccepted)
+		responseWriter.Write(nil)
 	}
 }
