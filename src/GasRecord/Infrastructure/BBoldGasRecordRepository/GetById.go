@@ -3,13 +3,13 @@ package gasrecord_infrastructure_bbold
 import (
 	"encoding/json"
 	"fmt"
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 
 	"go.etcd.io/bbolt"
 )
 
-func (repo *bboldGasRepository) GetById(id string) (GasRecord, error) {
-	var record GasRecord
+func (repo *bboldGasRepository) GetById(id string) (domain.GasRecord, error) {
+	var record domain.GasRecord
 
 	transactionError := repo.db.View(func(transaction *bbolt.Tx) error {
 		bucket := transaction.Bucket([]byte(bucket_name))
@@ -23,21 +23,17 @@ func (repo *bboldGasRepository) GetById(id string) (GasRecord, error) {
 			return RecordNotFound{id}
 		}
 
-		var rawRecord bboldGasRecord
-
-		parsingError := json.Unmarshal(byteRecord, &rawRecord)
+		parsingError := json.Unmarshal(byteRecord, &record)
 
 		if parsingError != nil {
 			return newParsingRecordError(byteRecord)
 		}
 
-		record = fromBBoldGasRecord(rawRecord)
-
 		return nil
 	})
 
 	if transactionError != nil {
-		return GasRecord{}, transactionError
+		return domain.GasRecord{}, transactionError
 	}
 
 	return record, nil

@@ -2,13 +2,13 @@ package gasrecord_infrastructure_bbold
 
 import (
 	"encoding/json"
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 	"log"
 
 	"go.etcd.io/bbolt"
 )
 
-func (repo *bboldGasRepository) Save(gasRecord GasRecord) error {
+func (repo *bboldGasRepository) Save(gasRecord domain.GasRecord) error {
 	updateErrorChan := make(chan error, 1) // Buffer de 1 para evitar bloqueo
 
 	go func() {
@@ -17,8 +17,7 @@ func (repo *bboldGasRepository) Save(gasRecord GasRecord) error {
 			if bucket == nil {
 				return bucketNotFoundError()
 			}
-			data := toBBoldGasRecord(gasRecord)
-			encodedData, parsingError := json.Marshal(data)
+			encodedData, parsingError := json.Marshal(gasRecord)
 			if parsingError != nil {
 				return newParsingRecordError([]byte{})
 			}
@@ -31,7 +30,7 @@ func (repo *bboldGasRepository) Save(gasRecord GasRecord) error {
 	var savingError error = nil
 	if updateError := <-updateErrorChan; updateError != nil {
 		log.Printf("Update error: %v", updateError.Error())
-		savingError = NewRecordNotSaved(gasRecord)
+		savingError = domain.NewRecordNotSaved(gasRecord)
 	}
 
 	return savingError

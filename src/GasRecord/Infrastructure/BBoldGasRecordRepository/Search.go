@@ -1,14 +1,14 @@
 package gasrecord_infrastructure_bbold
 
 import (
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 	share "gasto-api/src/Share"
 	"sort"
 )
 
-func (repo *bboldGasRepository) Search(criteria share.Criteria[GasRecord]) []GasRecord {
+func (repo *bboldGasRepository) Search(criteria share.Criteria[domain.GasRecord]) []domain.GasRecord {
 	allRecords := repo.GetAll()
-	filterRecords := []GasRecord{}
+	filterRecords := []domain.GasRecord{}
 
 	for _, record := range allRecords {
 		if criteria.Filter(record) {

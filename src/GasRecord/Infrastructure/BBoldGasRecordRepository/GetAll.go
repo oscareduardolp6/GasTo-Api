@@ -2,13 +2,13 @@ package gasrecord_infrastructure_bbold
 
 import (
 	"encoding/json"
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 
 	"go.etcd.io/bbolt"
 )
 
-func (repo *bboldGasRepository) GetAll() []GasRecord {
-	var records []GasRecord
+func (repo *bboldGasRepository) GetAll() []domain.GasRecord {
+	var records []domain.GasRecord
 	done := make(chan struct{})
 
 	go func() {
@@ -21,12 +21,11 @@ func (repo *bboldGasRepository) GetAll() []GasRecord {
 			}
 
 			return bucket.ForEach(func(_, row []byte) error {
-				var rawRecord bboldGasRecord
-				parsingError := json.Unmarshal(row, &rawRecord)
+				var record domain.GasRecord
+				parsingError := json.Unmarshal(row, &record)
 				if parsingError != nil {
 					return newParsingRecordError(row)
 				}
-				record := fromBBoldGasRecord(rawRecord)
 				records = append(records, record)
 				return nil
 			})

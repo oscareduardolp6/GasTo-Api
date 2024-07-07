@@ -2,7 +2,7 @@ package gasrecord_infrastructure_bbold
 
 import (
 	"fmt"
-	. "gasto-api/src/GasRecord"
+	domain "gasto-api/src/GasRecord"
 	"log"
 
 	"go.etcd.io/bbolt"
@@ -18,7 +18,7 @@ type bboldGasRepository struct {
 	db *bbolt.DB
 }
 
-func NewGasRecordRepository() (GasRecordRepository, error) {
+func NewGasRecordRepository() (domain.GasRecordRepository, error) {
 	db, dbError := bbolt.Open(db_path, read_and_write_permission, nil)
 	if dbError != nil {
 		return nil, dbError
