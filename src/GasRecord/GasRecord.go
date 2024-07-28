@@ -2,6 +2,7 @@ package gasrecord
 
 import (
 	share "gasto-api/src/Share"
+	"log"
 	"math"
 	"time"
 
@@ -25,11 +26,16 @@ type GasRecord struct {
 	Date               time.Time `json:"date" validate:"required"`
 	RoadTrip           bool      `json:"road_trip"`
 	Performance        float32   `json:"performance"`
+	Tank               GasTank   `json:"tank"`
 	domainEvents       []share.Event
 }
 
 func calculatePerformance(previous GasRecord, next GasRecord) float32 {
-	rawPerformance := next.TraveledKilometers / previous.Liters
+	utilizedLiters, litersError := previous.Tank.Final.Substract(next.Tank.Initial)
+	if litersError != nil {
+		log.Fatal(litersError)
+	}
+	rawPerformance := next.TraveledKilometers / utilizedLiters.Value
 	return float32(math.Ceil(float64(rawPerformance)))
 }
 
