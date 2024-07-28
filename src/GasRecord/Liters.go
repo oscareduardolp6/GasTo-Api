@@ -9,8 +9,8 @@ type Liters struct {
 }
 
 type GasTank struct {
-	Initial Liters `json:"initial"`
-	Final   Liters `json:"final"`
+	Initial Liters `json:"initial_liters"`
+	Final   Liters `json:"final_liters"`
 }
 
 type InvalidLitersQuantity struct {
