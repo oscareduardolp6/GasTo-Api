@@ -8,7 +8,7 @@ import (
 )
 
 func (repo *bboldGasRepository) GetAll() []domain.GasRecord {
-	var records []domain.GasRecord
+	records := make([]domain.GasRecord, 0)
 	done := make(chan struct{})
 
 	go func() {
