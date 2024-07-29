@@ -3,40 +3,39 @@ package gasrecord
 import (
 	share "gasto-api/src/Share"
 	"log"
-	"math"
 	"time"
-
-	"github.com/go-playground/validator/v10"
 )
 
-var validate *validator.Validate
-
-func init() {
-	validate = validator.New()
-
+type Tank struct {
+	Initial, Final Liters
 }
 
 type GasRecord struct {
-	Id                 string    `json:"id" validate:"required,uuid4"`
-	Place              string    `json:"place" validate:"required"`
-	Liters             float32   `json:"liters" validate:"gte=0"`
-	TotalPrice         float32   `json:"total_price" validate:"gte=0"`
-	TraveledKilometers float32   `json:"traveled_kilometers" jsonvalidate:"gte=0"`
-	PriceByLiter       float32   `json:"price_by_liter" validate:"gte=0"`
-	Date               time.Time `json:"date" validate:"required"`
-	RoadTrip           bool      `json:"road_trip"`
-	Performance        float32   `json:"performance"`
-	Tank               GasTank   `json:"tank"`
-	domainEvents       []share.Event
+	Id           GasRecordId
+	Place        share.NonEmptyString
+	Liters       Liters
+	Total        GasRecordPrice
+	Traveled     Kilometers
+	PriceByLiter GasRecordPrice
+	Date         time.Time
+	RoadTrip     bool
+	Performance  share.PositiveNumber
+	Tank         Tank
+	domainEvents []share.Event
 }
 
-func calculatePerformance(previous GasRecord, next GasRecord) float32 {
+func calculatePerformance(previous GasRecord, next GasRecord) share.PositiveNumber {
 	utilizedLiters, litersError := previous.Tank.Final.Substract(next.Tank.Initial)
 	if litersError != nil {
 		log.Fatal(litersError)
 	}
-	rawPerformance := next.TraveledKilometers / utilizedLiters.Value
-	return float32(math.Ceil(float64(rawPerformance)))
+
+	rawPerformance := next.Traveled.Value() / utilizedLiters.Value()
+	result, err := share.CreatePositiveNumber(rawPerformance)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return result
 }
 
 func (gasRecord *GasRecord) UpadatePerformance(next GasRecord) {
@@ -52,16 +51,47 @@ func (gasRecord *GasRecord) PullAllDomainEvents() []share.Event {
 	return returnedEvents
 }
 
-func ValidatePrimitives(gasRecord GasRecord) error {
-	return validate.Struct(gasRecord)
-}
+func CreateGasRecord(gasRecordPrimitives GasRecordPrimitives) (*GasRecord, *GasRecordError) {
 
-func CreateGasRecord(gasRecordPrimitives GasRecord) (*GasRecord, error) {
-	validationError := ValidatePrimitives(gasRecordPrimitives)
-	if validationError != nil {
-		return nil, validationError
+	id, idError := CreateGasRecordId(gasRecordPrimitives.Id)
+	place, placeError := share.CreateNonEmptyString(gasRecordPrimitives.Place)
+	liters, litersError := CreateLiters(gasRecordPrimitives.Liters)
+	total, totalError := CreateGasRecordPrice(gasRecordPrimitives.TotalPrice)
+	traveled, traveledError := CreateKilometers(gasRecordPrimitives.TraveledKilometers)
+	priceByLiter, priceByLiterError := CreateGasRecordPrice(gasRecordPrimitives.PriceByLiter)
+	initialLiters, initialLitersError := CreateLiters(gasRecordPrimitives.Tank.InitialLiters)
+	finalLiters, finalLitersError := CreateLiters(gasRecordPrimitives.Tank.FinalLiters)
+
+	if share.Any(share.IsNil, idError, placeError, litersError, totalError, traveledError, priceByLiterError, initialLitersError, finalLitersError) {
+		return nil, &GasRecordError{
+			Id:           idError,
+			Place:        placeError,
+			Liters:       litersError,
+			Total:        totalError,
+			Traveled:     traveledError,
+			PriceByLiter: priceByLiterError,
+			Tank: TankError{
+				Initial: initialLitersError,
+				Final:   finalLitersError,
+			},
+		}
 	}
-	newGasRecord := gasRecordPrimitives
-	newGasRecord.domainEvents = []share.Event{CreateGasRecordCreatedEvent(gasRecordPrimitives)}
-	return &newGasRecord, nil
+
+	gasRecord := GasRecord{
+		Id:           id,
+		Place:        place,
+		Liters:       liters,
+		Total:        total,
+		Traveled:     traveled,
+		PriceByLiter: priceByLiter,
+		Date:         gasRecordPrimitives.Date,
+		RoadTrip:     gasRecordPrimitives.RoadTrip,
+		Tank: Tank{
+			Initial: initialLiters,
+			Final:   finalLiters,
+		},
+		domainEvents: []share.Event{CreateGasRecordCreatedEvent(gasRecordPrimitives)},
+	}
+
+	return &gasRecord, nil
 }

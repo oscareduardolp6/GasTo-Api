@@ -7,5 +7,5 @@ type GasRecordRepository interface {
 	GetAll() []GasRecord
 	Close() error
 	Search(share.Criteria[GasRecord]) []GasRecord
-	GetById(id string) (GasRecord, error)
+	GetById(id GasRecordId) (GasRecord, error)
 }

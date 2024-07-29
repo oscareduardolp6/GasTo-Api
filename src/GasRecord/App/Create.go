@@ -5,13 +5,14 @@ import (
 	share "gasto-api/src/Share"
 )
 
-type gasRecordCreator func(primitives domain.GasRecord) error
+type gasRecordCreator func(primitives domain.GasRecordPrimitives) error
 
 func MakeCreateGasRecord(repository domain.GasRecordRepository, eventBus share.EventBus) gasRecordCreator {
-	return func(primitives domain.GasRecord) error {
+	return func(primitives domain.GasRecordPrimitives) error {
 		gasRecord, creationError := domain.CreateGasRecord(primitives)
 		if creationError != nil {
 			return creationError
+
 		}
 		savingError := repository.Save(*gasRecord)
 

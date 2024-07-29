@@ -13,8 +13,8 @@ func CreateGasRecordPerformanceUpdated(gasRecord GasRecord) share.Event {
 	return share.Event{
 		Topic: GAS_RECORD_CREATED_NAME,
 		Payload: GasRecordPerformanceUpdatedPayload{
-			RecordId:    gasRecord.Id,
-			Performance: gasRecord.Performance,
+			RecordId:    gasRecord.Id.Value(),
+			Performance: gasRecord.Performance.Value(),
 		},
 	}
 }

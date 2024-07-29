@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func MakeUpdatePerformanceGasRecord(repository domain.GasRecordRepository) func(createdRecordId string) error {
-	return func(createdRecordId string) error {
+func MakeUpdatePerformanceGasRecord(repository domain.GasRecordRepository) func(createdRecordId domain.GasRecordId) error {
+	return func(createdRecordId domain.GasRecordId) error {
 		createdGasRecord, gettingError := repository.GetById(createdRecordId)
 		if gettingError != nil {
 			return gettingError

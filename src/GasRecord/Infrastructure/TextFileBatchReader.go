@@ -12,12 +12,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func ReadRecordsFromTextFile(filePath string) (<-chan GasRecord, error) {
+func ReadRecordsFromTextFile(filePath string) (<-chan GasRecordPrimitives, error) {
 	file, openFileError := os.Open(filePath)
 	if openFileError != nil {
 		return nil, openFileError
 	}
-	recordsChan := make(chan GasRecord)
+	recordsChan := make(chan GasRecordPrimitives)
 
 	go func() {
 		defer close(recordsChan)
@@ -47,7 +47,7 @@ const (
 	roadtrip       = 7
 )
 
-func csvMapper(row string) GasRecord {
+func csvMapper(row string) GasRecordPrimitives {
 	parts := strings.Split(row, ",")
 
 	if len(parts) < 7 {
@@ -94,7 +94,7 @@ func csvMapper(row string) GasRecord {
 		log.Fatal("Price by Liter parsing failed", row)
 	}
 
-	primitives := GasRecord{
+	primitives := GasRecordPrimitives{
 		Id:                 uuid.NewString(),
 		Place:              place,
 		Liters:             float32(parsedLiters),

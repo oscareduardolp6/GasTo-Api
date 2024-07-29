@@ -6,7 +6,7 @@ import (
 	infra "gasto-api/src/GasRecord/Infrastructure"
 )
 
-func MakeBatchCreationFromFile(batchCreation func(reader <-chan domain.GasRecord) <-chan Result) func(filepath string) error {
+func MakeBatchCreationFromFile(batchCreation func(reader <-chan domain.GasRecordPrimitives) <-chan Result) func(filepath string) error {
 	return func(filepath string) error {
 		reader, errorReadingFile := infra.ReadRecordsFromTextFile(filepath)
 		if errorReadingFile != nil {

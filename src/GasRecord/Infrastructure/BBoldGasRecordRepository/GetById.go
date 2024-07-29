@@ -8,7 +8,7 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-func (repo *bboldGasRepository) GetById(id string) (domain.GasRecord, error) {
+func (repo *bboldGasRepository) GetById(id domain.GasRecordId) (domain.GasRecord, error) {
 	var record domain.GasRecord
 
 	transactionError := repo.db.View(func(transaction *bbolt.Tx) error {
@@ -41,7 +41,7 @@ func (repo *bboldGasRepository) GetById(id string) (domain.GasRecord, error) {
 }
 
 type RecordNotFound struct {
-	Id string
+	Id domain.GasRecordId
 }
 
 func (err RecordNotFound) Error() string {

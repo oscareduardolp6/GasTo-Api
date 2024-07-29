@@ -1,0 +1,22 @@
+GET http://localhost:8080/gasrecord
+
+### 
+
+PUT http://localhost:8080/gasrecord
+Content-Type: application/json
+
+{
+  "id": "48ea642d-90cc-4424-9936-85ada78d2b40", 
+  "place": "Gasolinería Gulf", 
+  "liters": 20, 
+  "total_price": 80.0, 
+  "traveled_kilometers": 10.0, 
+  "price_by_liter": 24.0, 
+  "date": "2024-08-01T00:00:00Z", 
+  "road_trip": false, 
+  "tank": {
+    "initial_liters": 9,
+    "final_liters": 66
+  }
+}
+
