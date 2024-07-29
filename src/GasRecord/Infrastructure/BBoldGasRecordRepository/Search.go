@@ -2,11 +2,11 @@ package gasrecord_infrastructure_bbold
 
 import (
 	domain "gasto-api/src/GasRecord"
-	share "gasto-api/src/Share"
+	shared "gasto-api/src/Shared"
 	"sort"
 )
 
-func (repo *bboldGasRepository) Search(criteria share.Criteria[domain.GasRecord]) []domain.GasRecord {
+func (repo *bboldGasRepository) Search(criteria shared.Criteria[domain.GasRecord]) []domain.GasRecord {
 	allRecords := repo.GetAll()
 	filterRecords := []domain.GasRecord{}
 

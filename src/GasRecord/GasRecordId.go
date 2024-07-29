@@ -2,7 +2,7 @@ package gasrecord
 
 import (
 	"fmt"
-	share "gasto-api/src/Share"
+	shared "gasto-api/src/Shared"
 
 	"github.com/google/uuid"
 )
@@ -22,7 +22,7 @@ func (err InvalidFormatGasRecordId) Error() string {
 }
 
 func CreateGasRecordId(id string) (GasRecordId, error) {
-	value, emptyError := share.CreateNonEmptyString(id)
+	value, emptyError := shared.CreateNonEmptyString(id)
 	if emptyError != nil {
 		return "", emptyError
 	}

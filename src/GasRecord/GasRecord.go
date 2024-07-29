@@ -1,7 +1,7 @@
 package gasrecord
 
 import (
-	share "gasto-api/src/Share"
+	shared "gasto-api/src/Shared"
 	"log"
 	"time"
 )
@@ -12,26 +12,26 @@ type Tank struct {
 
 type GasRecord struct {
 	Id           GasRecordId
-	Place        share.NonEmptyString
+	Place        shared.NonEmptyString
 	Liters       Liters
 	Total        GasRecordPrice
 	Traveled     Kilometers
 	PriceByLiter GasRecordPrice
 	Date         time.Time
 	RoadTrip     bool
-	Performance  share.PositiveNumber
+	Performance  shared.PositiveNumber
 	Tank         Tank
-	domainEvents []share.Event
+	domainEvents []shared.Event
 }
 
-func calculatePerformance(previous GasRecord, next GasRecord) share.PositiveNumber {
+func calculatePerformance(previous GasRecord, next GasRecord) shared.PositiveNumber {
 	utilizedLiters, litersError := previous.Tank.Final.Substract(next.Tank.Initial)
 	if litersError != nil {
 		log.Fatal(litersError)
 	}
 
 	rawPerformance := next.Traveled.Value() / utilizedLiters.Value()
-	result, err := share.CreatePositiveNumber(rawPerformance)
+	result, err := shared.CreatePositiveNumber(rawPerformance)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,18 +43,18 @@ func (gasRecord *GasRecord) UpadatePerformance(next GasRecord) {
 	gasRecord.domainEvents = append(gasRecord.domainEvents, CreateGasRecordPerformanceUpdated(*gasRecord))
 }
 
-func (gasRecord *GasRecord) PullAllDomainEvents() []share.Event {
+func (gasRecord *GasRecord) PullAllDomainEvents() []shared.Event {
 	numOfEvents := len(gasRecord.domainEvents)
-	returnedEvents := make([]share.Event, numOfEvents)
+	returnedEvents := make([]shared.Event, numOfEvents)
 	copy(returnedEvents, gasRecord.domainEvents)
-	gasRecord.domainEvents = []share.Event{}
+	gasRecord.domainEvents = []shared.Event{}
 	return returnedEvents
 }
 
 func CreateGasRecord(gasRecordPrimitives GasRecordPrimitives) (*GasRecord, *GasRecordError) {
 
 	id, idError := CreateGasRecordId(gasRecordPrimitives.Id)
-	place, placeError := share.CreateNonEmptyString(gasRecordPrimitives.Place)
+	place, placeError := shared.CreateNonEmptyString(gasRecordPrimitives.Place)
 	liters, litersError := CreateLiters(gasRecordPrimitives.Liters)
 	total, totalError := CreateGasRecordPrice(gasRecordPrimitives.TotalPrice)
 	traveled, traveledError := CreateKilometers(gasRecordPrimitives.TraveledKilometers)
@@ -62,7 +62,7 @@ func CreateGasRecord(gasRecordPrimitives GasRecordPrimitives) (*GasRecord, *GasR
 	initialLiters, initialLitersError := CreateLiters(gasRecordPrimitives.Tank.InitialLiters)
 	finalLiters, finalLitersError := CreateLiters(gasRecordPrimitives.Tank.FinalLiters)
 
-	if share.Any(share.IsNil, idError, placeError, litersError, totalError, traveledError, priceByLiterError, initialLitersError, finalLitersError) {
+	if shared.Any(shared.IsNil, idError, placeError, litersError, totalError, traveledError, priceByLiterError, initialLitersError, finalLitersError) {
 		return nil, &GasRecordError{
 			Id:           idError,
 			Place:        placeError,
@@ -90,7 +90,7 @@ func CreateGasRecord(gasRecordPrimitives GasRecordPrimitives) (*GasRecord, *GasR
 			Initial: initialLiters,
 			Final:   finalLiters,
 		},
-		domainEvents: []share.Event{CreateGasRecordCreatedEvent(gasRecordPrimitives)},
+		domainEvents: []shared.Event{CreateGasRecordCreatedEvent(gasRecordPrimitives)},
 	}
 
 	return &gasRecord, nil

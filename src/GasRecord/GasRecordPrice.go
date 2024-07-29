@@ -1,11 +1,11 @@
 package gasrecord
 
-import share "gasto-api/src/Share"
+import shared "gasto-api/src/Shared"
 
 type GasRecordPrice float32
 
 func CreateGasRecordPrice(price float32) (GasRecordPrice, error) {
-	value, positiveNumberError := share.CreatePositiveNumber(price)
+	value, positiveNumberError := shared.CreatePositiveNumber(price)
 	if positiveNumberError != nil {
 		return 0, positiveNumberError
 	}

@@ -2,7 +2,7 @@ package share_infrastructure_inmemoryeventbus
 
 import (
 	"fmt"
-	domain "gasto-api/src/Share"
+	domain "gasto-api/src/Shared"
 	"sync"
 )
 

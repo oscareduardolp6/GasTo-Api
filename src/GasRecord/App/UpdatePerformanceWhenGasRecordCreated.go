@@ -2,12 +2,12 @@ package app
 
 import (
 	domain "gasto-api/src/GasRecord"
-	share "gasto-api/src/Share"
+	shared "gasto-api/src/Shared"
 	"log"
 )
 
-func MakeUpdatePerformanceWhenGasRecordCreated(repo domain.GasRecordRepository) func(share.Event) {
-	return func(event share.Event) {
+func MakeUpdatePerformanceWhenGasRecordCreated(repo domain.GasRecordRepository) func(shared.Event) {
+	return func(event shared.Event) {
 		if !canManageEvent(event) {
 			return
 		}
@@ -20,7 +20,7 @@ func MakeUpdatePerformanceWhenGasRecordCreated(repo domain.GasRecordRepository) 
 	}
 }
 
-func canManageEvent(event share.Event) bool {
+func canManageEvent(event shared.Event) bool {
 	_, ok := event.Payload.(domain.GasRecord)
 	return ok && event.Topic == domain.GAS_RECORD_CREATED_NAME
 }

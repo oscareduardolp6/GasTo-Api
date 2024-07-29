@@ -1,6 +1,6 @@
 package gasrecord
 
-import share "gasto-api/src/Share"
+import shared "gasto-api/src/Shared"
 
 type Kilometers float32
 
@@ -9,7 +9,7 @@ func (val Kilometers) Value() float32 {
 }
 
 func CreateKilometers(val float32) (Kilometers, error) {
-	value, positiveNumError := share.CreatePositiveNumber(val)
+	value, positiveNumError := shared.CreatePositiveNumber(val)
 	if positiveNumError != nil {
 		return 0, positiveNumError
 	}

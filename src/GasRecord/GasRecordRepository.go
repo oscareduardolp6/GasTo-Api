@@ -1,11 +1,11 @@
 package gasrecord
 
-import share "gasto-api/src/Share"
+import shared "gasto-api/src/Shared"
 
 type GasRecordRepository interface {
 	Save(gasRecord GasRecord) error
 	GetAll() []GasRecord
 	Close() error
-	Search(share.Criteria[GasRecord]) []GasRecord
+	Search(shared.Criteria[GasRecord]) []GasRecord
 	GetById(id GasRecordId) (GasRecord, error)
 }

@@ -2,12 +2,12 @@ package app
 
 import (
 	domain "gasto-api/src/GasRecord"
-	share "gasto-api/src/Share"
+	shared "gasto-api/src/Shared"
 )
 
 type gasRecordCreator func(primitives domain.GasRecordPrimitives) error
 
-func MakeCreateGasRecord(repository domain.GasRecordRepository, eventBus share.EventBus) gasRecordCreator {
+func MakeCreateGasRecord(repository domain.GasRecordRepository, eventBus shared.EventBus) gasRecordCreator {
 	return func(primitives domain.GasRecordPrimitives) error {
 		gasRecord, creationError := domain.CreateGasRecord(primitives)
 		if creationError != nil {
