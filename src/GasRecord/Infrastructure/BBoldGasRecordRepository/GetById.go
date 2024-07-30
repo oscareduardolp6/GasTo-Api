@@ -2,7 +2,6 @@ package gasrecord_infrastructure_bbold
 
 import (
 	"encoding/json"
-	"fmt"
 	domain "gasto-api/src/GasRecord"
 
 	"go.etcd.io/bbolt"
@@ -20,7 +19,7 @@ func (repo *bboldGasRepository) GetById(id domain.GasRecordId) (domain.GasRecord
 
 		byteRecord := bucket.Get([]byte(id))
 		if byteRecord == nil {
-			return RecordNotFound{id}
+			return domain.RecordNotFound{Id: id}
 		}
 
 		parsingError := json.Unmarshal(byteRecord, &record)
@@ -38,12 +37,4 @@ func (repo *bboldGasRepository) GetById(id domain.GasRecordId) (domain.GasRecord
 
 	return record, nil
 
-}
-
-type RecordNotFound struct {
-	Id domain.GasRecordId
-}
-
-func (err RecordNotFound) Error() string {
-	return fmt.Sprintf("Record with ID: <%v> not found ", err.Id)
 }

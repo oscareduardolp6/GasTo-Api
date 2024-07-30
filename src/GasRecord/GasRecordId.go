@@ -3,6 +3,7 @@ package gasrecord
 import (
 	"fmt"
 	shared "gasto-api/src/Shared"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -11,6 +12,10 @@ type GasRecordId string
 
 func (val GasRecordId) Value() string {
 	return string(val)
+}
+
+func (val GasRecordId) Equals(val2 GasRecordId) bool {
+	return strings.EqualFold(val.Value(), val2.Value())
 }
 
 type InvalidFormatGasRecordId struct {

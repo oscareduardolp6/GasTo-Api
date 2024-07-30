@@ -13,11 +13,22 @@ func Any[T any](predicate func(T) bool, values ...T) bool {
 	return false
 }
 
-// func Any[T any](array []T, predicate func(T) bool) bool {
-// 	for _, value := range array {
-// 		if predicate(value) {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
+func Filter[T any](predicate func(T) bool, values ...T) []T {
+	filteredValues := make([]T, 0)
+	for _, value := range values {
+		if predicate(value) {
+			filteredValues = append(filteredValues, value)
+		}
+	}
+	return filteredValues
+}
+
+func Find[T any](predicate func(T) bool, values []T) *T {
+	for _, value := range values {
+		if predicate(value) {
+			result := value
+			return &result
+		}
+	}
+	return nil
+}
